@@ -14,7 +14,7 @@ import { HomeContainer, Product } from '../styles/pages/home';
 interface Products {
   id: string,
   name: string,
-  price: number,
+  price: string,
   imageUrl: string,
   description: string,
   placeholderImage: string,
@@ -79,8 +79,11 @@ export const getStaticProps: GetStaticProps = async () => {
       name: product.name,
       placeholderImage: base64,
       imageUrl: product.images[0],
-      price: Number(price.unit_amount) / 100,
       description: product.description,
+      price: new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      }).format(Number(price.unit_amount) / 100),
     }
   }));
 
