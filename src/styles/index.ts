@@ -28,5 +28,11 @@ export const {
       highlight: '#00875F',
       highlightSelected: '#00B37E',
     },
+    fonts: {
+      md: '1.125rem',
+      lg: '1.25rem',
+      xl: '1.5rem',
+      '2xl': '2rem',
+    },
   },
 });
