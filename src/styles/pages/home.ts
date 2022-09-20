@@ -2,7 +2,6 @@ import { styled } from "..";
 
 export const HomeContainer = styled('main', {
   display: 'flex',
-  gap: '3rem',
 
   width: '100%',
   maxWidth: 'calc(100vw - ((100vw - 1180px) / 2))',
@@ -15,8 +14,6 @@ export const Product = styled('a', {
   position: 'relative',
   alignItems: 'center',
   justifyContent: 'center',
-
-  padding: '0.25rem',
 
   borderRadius: 8,
   overflow: 'hidden',
