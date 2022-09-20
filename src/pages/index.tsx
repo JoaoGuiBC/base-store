@@ -1,16 +1,30 @@
-import type { NextPage } from 'next';
+import type { GetServerSideProps, NextPage } from 'next';
+
+import Stripe from 'stripe';
+import Head from 'next/head';
 import Image from 'next/future/image';
+import { getPlaiceholder } from 'plaiceholder';
 import { useKeenSlider } from 'keen-slider/react';
+
+import { stripe } from '../lib/stripe';
 
 import 'keen-slider/keen-slider.min.css';
 import { HomeContainer, Product } from '../styles/pages/home';
 
-import catHood from '../assets/products/cat.png';
-import meltHood from '../assets/products/melt.png';
-import confuseHood from '../assets/products/confuse.png';
-import happyHood from '../assets/products/happy.png';
+interface Products {
+  id: string,
+  name: string,
+  price: number,
+  imageUrl: string,
+  description: string,
+  placeholderImage: string,
+}
 
-const Home: NextPage = () => {
+interface HomeProps {
+  products: Products[],
+}
+
+const Home: NextPage<HomeProps> = ({ products }) => {
   const [sliderRef] = useKeenSlider({
     slides: {
       perView: 3,
@@ -20,43 +34,59 @@ const Home: NextPage = () => {
 
   return (
     <HomeContainer ref={sliderRef} className="keen-slider">
-      <Product className="keen-slider__slide">
-        <Image src={catHood} alt="beanie for sale" width={364} height={336} />
+      <Head>
+        <title>Base Store</title>
+      </Head>
 
-        <footer>
-          <strong>Gorro Gatinho</strong>
-          <span>R$ 16,90</span>
-        </footer>
-      </Product>
+      {products.map(product => (
+        <Product key={product.id} className="keen-slider__slide">
+          <Image
+            src={product.imageUrl}
+            blurDataURL={product.placeholderImage}
+            alt={product.description}
+            width={364}
+            height={336}
+            placeholder="blur"
+          />
 
-      <Product className="keen-slider__slide">
-        <Image src={meltHood} alt="beanie for sale" width={364} height={336} />
-
-        <footer>
-          <strong>Gorro Derretido</strong>
-          <span>R$ 16,90</span>
-        </footer>
-      </Product>
-
-      <Product className="keen-slider__slide">
-        <Image src={confuseHood} alt="beanie for sale" width={364} height={336} />
-
-        <footer>
-          <strong>Gorro Confuso</strong>
-          <span>R$ 16,90</span>
-        </footer>
-      </Product>
-
-      <Product className="keen-slider__slide">
-        <Image src={happyHood} alt="beanie for sale" width={364} height={336} />
-
-        <footer>
-          <strong>Gorro Feliz</strong>
-          <span>R$ 16,90</span>
-        </footer>
-      </Product>
+          <footer>
+            <strong>{product.name}</strong>
+            <span>{product.price}</span>
+          </footer>
+        </Product>
+      ))}
     </HomeContainer>
   )
 }
 
 export default Home;
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const response = await stripe.products.list({
+    expand: ['data.default_price'],
+  });
+
+  const products = await Promise.all(response.data.map(async product => {
+    const price = product.default_price as Stripe.Price;
+
+    const { base64 } = await getPlaiceholder(
+      product.images[0],
+      { size: 10 }
+    );
+
+    return {
+      id: product.id,
+      name: product.name,
+      placeholderImage: base64,
+      imageUrl: product.images[0],
+      price: Number(price.unit_amount) / 100,
+      description: product.description,
+    }
+  }));
+
+  return {
+    props: {
+      products,
+    }
+  }
+}
