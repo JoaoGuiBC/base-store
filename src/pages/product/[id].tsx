@@ -1,28 +1,51 @@
-import type { NextPage } from "next";
+import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
 
+import Stripe from "stripe";
 import Head from "next/head";
-import { useRouter } from "next/router";
+import { getPlaiceholder } from "plaiceholder";
+
+import { stripe } from "../../lib/stripe";
 
 import { ImageContainer, ProductContainer, ProductDetails } from "../../styles/pages/product";
+import Image from "next/future/image";
 
-const Product: NextPage = () => {
-  const { query } = useRouter();
+interface Product {
+  id: string,
+  name: string,
+  price: string,
+  imageUrl: string,
+  imageAlt: string,
+  description: string,
+  placeholderImage: string,
+}
 
+interface ProductProps {
+  product: Product,
+}
+
+const Product: NextPage<ProductProps> = ({ product }) => {
   return (
     <ProductContainer>
       <Head>
-        <title>Base Store | Gorro X</title>
+        <title>Base Store |</title>
       </Head>
 
       <ImageContainer>
-
+        <Image
+          src={product.imageUrl}
+          blurDataURL={product.placeholderImage}
+          alt={product.imageAlt}
+          width={364}
+          height={336}
+          placeholder="blur"
+        />
       </ImageContainer>
 
       <ProductDetails>
-        <h1>Gorro X</h1>
-        <span>R$ 16,99</span>
+        <h1>{product.name}</h1>
+        <span>{product.price}</span>
 
-        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minima nisi labore totam ducimus expedita deserunt fugiat fuga vel dolor nobis itaque beatae, tenetur vitae rem quisquam adipisci nihil at id?</p>
+        <p>{product.description}</p>
 
         <button>
           Comprar agora
@@ -33,3 +56,40 @@ const Product: NextPage = () => {
 }
 
 export default Product;
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: 'blocking',
+  }
+} 
+
+export const getStaticProps: GetStaticProps<{ product: Product }, { id: string }> = async ({ params }) => {
+  const productId = params!.id;
+  
+  const product = await stripe.products.retrieve(productId, {
+    expand: ['default_price'],
+  });
+
+  const price = product.default_price as Stripe.Price;
+
+  const { base64 } = await getPlaiceholder(product.images[0]);
+
+  return {
+    props: {
+      product: {
+        id: product.id,
+        name: product.name,
+        placeholderImage: base64,
+        imageUrl: product.images[0],
+        imageAlt: product.metadata.alt,
+        description: String(product.description),
+        price: new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        }).format(Number(price.unit_amount) / 100),
+      }
+    },
+    revalidate: 60 * 60 * 3, // 3 hours
+  };
+}

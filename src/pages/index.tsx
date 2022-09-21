@@ -64,7 +64,7 @@ const Home: NextPage<HomeProps> = ({ products }) => {
 
 export default Home;
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getStaticProps: GetStaticProps<{ products: Products[] }> = async () => {
   const response = await stripe.products.list({
     expand: ['data.default_price'],
   });
@@ -72,10 +72,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const products = await Promise.all(response.data.map(async product => {
     const price = product.default_price as Stripe.Price;
 
-    const { base64 } = await getPlaiceholder(
-      product.images[0],
-      { size: 10 }
-    );
+    const { base64 } = await getPlaiceholder(product.images[0]);
 
     return {
       id: product.id,
