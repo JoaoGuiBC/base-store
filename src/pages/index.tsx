@@ -2,6 +2,7 @@ import type { GetStaticProps, NextPage } from 'next';
 
 import Stripe from 'stripe';
 import Head from 'next/head';
+import Link from 'next/link';
 import Image from 'next/future/image';
 import { getPlaiceholder } from 'plaiceholder';
 import { useKeenSlider } from 'keen-slider/react';
@@ -16,7 +17,7 @@ interface Products {
   name: string,
   price: string,
   imageUrl: string,
-  description: string,
+  imageAlt: string,
   placeholderImage: string,
 }
 
@@ -39,21 +40,23 @@ const Home: NextPage<HomeProps> = ({ products }) => {
       </Head>
 
       {products.map(product => (
-        <Product key={product.id} className="keen-slider__slide">
-          <Image
-            src={product.imageUrl}
-            blurDataURL={product.placeholderImage}
-            alt={product.description}
-            width={364}
-            height={336}
-            placeholder="blur"
-          />
+        <Link key={product.id} href={`/product/${product.id}`}>
+          <Product className="keen-slider__slide" href={`/product/${product.id}`}>
+            <Image
+              src={product.imageUrl}
+              blurDataURL={product.placeholderImage}
+              alt={product.imageAlt}
+              width={364}
+              height={336}
+              placeholder="blur"
+            />
 
-          <footer>
-            <strong>{product.name}</strong>
-            <span>{product.price}</span>
-          </footer>
-        </Product>
+            <footer>
+              <strong>{product.name}</strong>
+              <span>{product.price}</span>
+            </footer>
+          </Product>
+        </Link>
       ))}
     </HomeContainer>
   )
@@ -79,7 +82,7 @@ export const getStaticProps: GetStaticProps = async () => {
       name: product.name,
       placeholderImage: base64,
       imageUrl: product.images[0],
-      description: product.description,
+      imageAlt: product.metadata.alt,
       price: new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL'

@@ -17,6 +17,7 @@ export const Product = styled('a', {
 
   borderRadius: 8,
   overflow: 'hidden',
+  color: '$title',
   background: 'linear-gradient(180deg, #1EA483 0%, #7465D4 100%)',
 
   cursor: 'pointer',
@@ -45,7 +46,7 @@ export const Product = styled('a', {
     transition: 'all 0.2s ease-in-out',
 
     strong: {
-      fontSize: '$lg',
+      fontSize: '$xl',
     },
 
     span: {

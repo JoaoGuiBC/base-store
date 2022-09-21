@@ -15,5 +15,5 @@ export const Header = styled('div', {
   maxWidth: 1180,
 
   margin: '0 auto',
-  padding: '2rem 0',
+  padding: '1rem 0',
 });
