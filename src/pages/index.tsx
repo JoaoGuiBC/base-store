@@ -40,7 +40,7 @@ const Home: NextPage<HomeProps> = ({ products }) => {
       </Head>
 
       {products.map(product => (
-        <Link key={product.id} href={`/product/${product.id}`}>
+        <Link key={product.id} href={`/product/${product.id}`} prefetch={false}>
           <Product className="keen-slider__slide" href={`/product/${product.id}`}>
             <Image
               src={product.imageUrl}

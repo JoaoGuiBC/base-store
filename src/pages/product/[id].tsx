@@ -16,6 +16,7 @@ interface Product {
   imageUrl: string,
   imageAlt: string,
   description: string,
+  defaultPriceId: string,
   placeholderImage: string,
 }
 
@@ -24,10 +25,14 @@ interface ProductProps {
 }
 
 const Product: NextPage<ProductProps> = ({ product }) => {
+  function handleBuyProduct() {
+    console.log(product.defaultPriceId);
+  }
+
   return (
     <ProductContainer>
       <Head>
-        <title>Base Store |</title>
+        <title>Base Store | {product.name}</title>
       </Head>
 
       <ImageContainer>
@@ -47,7 +52,7 @@ const Product: NextPage<ProductProps> = ({ product }) => {
 
         <p>{product.description}</p>
 
-        <button>
+        <button onClick={handleBuyProduct}>
           Comprar agora
         </button>
       </ProductDetails>
@@ -80,6 +85,7 @@ export const getStaticProps: GetStaticProps<{ product: Product }, { id: string }
       product: {
         id: product.id,
         name: product.name,
+        defaultPriceId: price.id,
         placeholderImage: base64,
         imageUrl: product.images[0],
         imageAlt: product.metadata.alt,
