@@ -4,13 +4,15 @@ import Stripe from 'stripe';
 import Head from 'next/head';
 import Link from 'next/link';
 import Image from 'next/future/image';
+import { useState, useEffect } from 'react';
 import { getPlaiceholder } from 'plaiceholder';
 import { useKeenSlider } from 'keen-slider/react';
+import { CaretRight, CaretLeft } from 'phosphor-react';
 
 import { stripe } from '../lib/stripe';
 
 import 'keen-slider/keen-slider.min.css';
-import { HomeContainer, Product } from '../styles/pages/home';
+import { HomeContainer, Product, SlideButton } from '../styles/pages/home';
 
 interface Products {
   id: string,
@@ -26,12 +28,22 @@ interface HomeProps {
 }
 
 const Home: NextPage<HomeProps> = ({ products }) => {
-  const [sliderRef] = useKeenSlider({
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [slidesLength, setSlidesLength] = useState(0);
+  const [sliderRef, instanceRef] = useKeenSlider({
     slides: {
       perView: 3,
       spacing: 48,
-    }
+    },
+    slideChanged(slider) {
+      setCurrentSlide(slider.track.details.rel)
+    },
   });
+
+  useEffect(() => {
+    setSlidesLength(instanceRef!.current!.track.details.slides.length - 1);
+    console.log(instanceRef!.current!.track.details.slides.length)
+  }, [instanceRef]);
 
   return (
     <>
@@ -59,6 +71,26 @@ const Home: NextPage<HomeProps> = ({ products }) => {
             </Product>
           </Link>
         ))}
+
+        <SlideButton
+          direction="left"
+          onClick={(e: any) =>
+            e.stopPropagation() || instanceRef.current?.prev()
+          }
+          disabled={currentSlide === 0}
+        >
+          <CaretLeft size={48} />
+        </SlideButton>
+
+        <SlideButton
+          direction="right"
+          onClick={(e: any) =>
+            e.stopPropagation() || instanceRef.current?.next()
+          }
+          disabled={currentSlide === slidesLength - 2}
+        >
+          <CaretRight size={48} />
+        </SlideButton>
       </HomeContainer>
     </>
   )
