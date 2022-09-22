@@ -1,13 +1,15 @@
 import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
 
+import axios from "axios";
 import Stripe from "stripe";
 import Head from "next/head";
+import { useState } from "react";
+import Image from "next/future/image";
 import { getPlaiceholder } from "plaiceholder";
 
 import { stripe } from "../../lib/stripe";
 
 import { ImageContainer, ProductContainer, ProductDetails } from "../../styles/pages/product";
-import Image from "next/future/image";
 
 interface Product {
   id: string,
@@ -25,8 +27,23 @@ interface ProductProps {
 }
 
 const Product: NextPage<ProductProps> = ({ product }) => {
-  function handleBuyProduct() {
-    console.log(product.defaultPriceId);
+  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] = useState(false);
+
+  async function handleBuyProduct() {
+    try {
+      setIsCreatingCheckoutSession(true);
+
+      const response = await axios.post('/api/createCheckoutSession', {
+        priceId: product.defaultPriceId,
+      });
+
+      const { checkoutUrl } = response.data;
+
+      window.location.href = checkoutUrl;
+    } catch (error) {
+      setIsCreatingCheckoutSession(false);
+      alert('Erro ao redirecionar para o checkout, por favor tente novamente mais tarde.');
+    }
   }
 
   return (
@@ -52,7 +69,7 @@ const Product: NextPage<ProductProps> = ({ product }) => {
 
         <p>{product.description}</p>
 
-        <button onClick={handleBuyProduct}>
+        <button disabled={isCreatingCheckoutSession} onClick={handleBuyProduct}>
           Comprar agora
         </button>
       </ProductDetails>
