@@ -1,12 +1,28 @@
-import type { NextPage } from 'next';
+import type { GetServerSideProps, NextPage } from 'next';
 
+import Stripe from 'stripe';
 import Head from 'next/head';
 import Link from 'next/link';
 import Image from 'next/future/image';
 
-import { ImageContainer, SuccessContainer } from '../styles/pages/success';
+import { stripe } from '../lib/stripe';
 
-const Success: NextPage = () => {
+import { ImageContainer, SuccessContainer } from '../styles/pages/success';
+import { getPlaiceholder } from 'plaiceholder';
+
+interface Product {
+  name: string,
+  imageUrl: string,
+  imageAlt: string,
+  placeholderImage: string,
+}
+
+interface SuccessProps {
+  product: Product,
+  customerName: string,
+}
+
+const Success: NextPage<SuccessProps> = ({ customerName, product }) => {
 
   return (
     <SuccessContainer>
@@ -17,11 +33,18 @@ const Success: NextPage = () => {
       <h1>Compra efetuada!</h1>
 
       <ImageContainer>
-
+        <Image
+          src={product.imageUrl}
+          blurDataURL={product.placeholderImage}
+          alt={product.imageAlt}
+          width={120}
+          height={110}
+          placeholder="blur"
+        />
       </ImageContainer>
 
       <p>
-        Sucesso <strong>JoaoGuiBC</strong>, seu <strong>Gorro Esqueleto</strong> já está a caminho da sua casa.
+        Sucesso <strong>{customerName}</strong>, seu <strong>{product.name}</strong> já está a caminho da sua casa.
       </p>
 
       <Link href="/">
@@ -32,3 +55,27 @@ const Success: NextPage = () => {
 }
 
 export default Success;
+
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+  const sessionId = String(query.session_id);
+
+  const session = await stripe.checkout.sessions.retrieve(sessionId, {
+    expand: ['line_items', 'line_items.data.price.product'],
+  });
+
+  const customerName = session.customer_details?.name!;
+  const product = session.line_items?.data[0]?.price?.product as Stripe.Product;
+  const { base64 } = await getPlaiceholder(product.images[0]);
+
+  return {
+    props: {
+      customerName,
+      product: {
+        name: product.name,
+        placeholderImage: base64,
+        imageUrl: product.images[0],
+        imageAlt: product.metadata.alt,
+      },
+    },
+  }
+};
