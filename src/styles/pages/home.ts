@@ -9,7 +9,7 @@ export const HomeContainer = styled('main', {
   marginLeft: 'auto',
 });
 
-export const Product = styled('a', {
+export const Product = styled('div', {
   display: 'flex',
   position: 'relative',
   alignItems: 'center',
