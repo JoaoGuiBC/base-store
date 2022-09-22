@@ -25,32 +25,36 @@ interface SuccessProps {
 const Success: NextPage<SuccessProps> = ({ customerName, product }) => {
 
   return (
-    <SuccessContainer>
+    <>
       <Head>
         <title>Base Store | Compra efetuada</title>
+
+        <meta name="robots" content="noindex" />
       </Head>
+    
+      <SuccessContainer>
+        <h1>Compra efetuada!</h1>
 
-      <h1>Compra efetuada!</h1>
+        <ImageContainer>
+          <Image
+            src={product.imageUrl}
+            blurDataURL={product.placeholderImage}
+            alt={product.imageAlt}
+            width={120}
+            height={110}
+            placeholder="blur"
+          />
+        </ImageContainer>
 
-      <ImageContainer>
-        <Image
-          src={product.imageUrl}
-          blurDataURL={product.placeholderImage}
-          alt={product.imageAlt}
-          width={120}
-          height={110}
-          placeholder="blur"
-        />
-      </ImageContainer>
+        <p>
+          Sucesso <strong>{customerName}</strong>, seu <strong>{product.name}</strong> já está a caminho da sua casa.
+        </p>
 
-      <p>
-        Sucesso <strong>{customerName}</strong>, seu <strong>{product.name}</strong> já está a caminho da sua casa.
-      </p>
-
-      <Link href="/">
-        Voltar ao catálogo
-      </Link>
-    </SuccessContainer>
+        <Link href="/">
+          Voltar ao catálogo
+        </Link>
+      </SuccessContainer>
+    </>
   )
 }
 

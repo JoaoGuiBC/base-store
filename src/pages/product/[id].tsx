@@ -47,33 +47,36 @@ const Product: NextPage<ProductProps> = ({ product }) => {
   }
 
   return (
-    <ProductContainer>
+    <>
       <Head>
         <title>Base Store | {product.name}</title>
       </Head>
+      <ProductContainer>
+        
 
-      <ImageContainer>
-        <Image
-          src={product.imageUrl}
-          blurDataURL={product.placeholderImage}
-          alt={product.imageAlt}
-          width={364}
-          height={336}
-          placeholder="blur"
-        />
-      </ImageContainer>
+        <ImageContainer>
+          <Image
+            src={product.imageUrl}
+            blurDataURL={product.placeholderImage}
+            alt={product.imageAlt}
+            width={364}
+            height={336}
+            placeholder="blur"
+          />
+        </ImageContainer>
 
-      <ProductDetails>
-        <h1>{product.name}</h1>
-        <span>{product.price}</span>
+        <ProductDetails>
+          <h1>{product.name}</h1>
+          <span>{product.price}</span>
 
-        <p>{product.description}</p>
+          <p>{product.description}</p>
 
-        <button disabled={isCreatingCheckoutSession} onClick={handleBuyProduct}>
-          Comprar agora
-        </button>
-      </ProductDetails>
-    </ProductContainer>
+          <button disabled={isCreatingCheckoutSession} onClick={handleBuyProduct}>
+            Comprar agora
+          </button>
+        </ProductDetails>
+      </ProductContainer>
+    </>
   );
 }
 

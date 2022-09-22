@@ -34,31 +34,33 @@ const Home: NextPage<HomeProps> = ({ products }) => {
   });
 
   return (
-    <HomeContainer ref={sliderRef} className="keen-slider">
+    <>
       <Head>
         <title>Base Store</title>
       </Head>
+      <HomeContainer ref={sliderRef} className="keen-slider">
 
-      {products.map(product => (
-        <Link key={product.id} href={`/product/${product.id}`} prefetch={false}>
-          <Product className="keen-slider__slide">
-            <Image
-              src={product.imageUrl}
-              blurDataURL={product.placeholderImage}
-              alt={product.imageAlt}
-              width={364}
-              height={336}
-              placeholder="blur"
-            />
+        {products.map(product => (
+          <Link key={product.id} href={`/product/${product.id}`} prefetch={false}>
+            <Product className="keen-slider__slide">
+              <Image
+                src={product.imageUrl}
+                blurDataURL={product.placeholderImage}
+                alt={product.imageAlt}
+                width={364}
+                height={336}
+                placeholder="blur"
+              />
 
-            <footer>
-              <strong>{product.name}</strong>
-              <span>{product.price}</span>
-            </footer>
-          </Product>
-        </Link>
-      ))}
-    </HomeContainer>
+              <footer>
+                <strong>{product.name}</strong>
+                <span>{product.price}</span>
+              </footer>
+            </Product>
+          </Link>
+        ))}
+      </HomeContainer>
+    </>
   )
 }
 
