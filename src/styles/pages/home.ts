@@ -21,10 +21,9 @@ export const Product = styled('div', {
   color: '$title',
   background: 'linear-gradient(180deg, #1EA483 0%, #7465D4 100%)',
 
-  cursor: 'pointer',
-
   img: {
     objectFit: 'cover',
+    cursor: 'pointer',
   },
 
   footer: {
@@ -37,7 +36,7 @@ export const Product = styled('div', {
     alignItems: 'center',
     justifyContent: 'space-between',
 
-    padding: '2rem',
+    padding: '1.25rem',
 
     borderRadius: 6,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
@@ -46,15 +45,37 @@ export const Product = styled('div', {
     opacity: 0,
     transition: 'all 0.2s ease-in-out',
 
+    div: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 4,
+    },
+
     strong: {
-      fontSize: '$xl',
+      fontSize: '$lg',
     },
 
     span: {
-      fontSize: '$xl',
+      fontSize: '$lg',
       fontWeight: 'bold',
       color: '$highlightSelected',
     },
+
+    button: {
+      padding: '0.75rem',
+      
+      border: 'none',
+      color: '$shape',
+      borderRadius: 6,
+      cursor: 'pointer',
+      backgroundColor: '$highlight',
+
+      transition: 'background 0.2s',
+
+      '&:hover': {
+        backgroundColor: '$highlightSelected',
+      },
+    }
   },
 
   '&:hover': {

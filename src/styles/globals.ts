@@ -5,6 +5,8 @@ export const globalStyles = globalCss({
     margin: 0,
     padding: 0,
     boxSizing: 'border-box',
+    scrollbarColor: '$background $icon',
+    scrollbarWidth: '4px',
   },
 
   html: {
@@ -14,6 +16,18 @@ export const globalStyles = globalCss({
     '@md': {
       fontSize: '87.5%',
     },
+  },
+
+  '::-webkit-scrollbar': {
+    width: '4px',
+  },
+  
+  '::-webkit-scrollbar-track': {
+    backgroundColor: '$icon',
+  },
+  
+  '::-webkit-scrollbar-thumb': {
+    backgroundColor: '$background',
   },
 
   body: {

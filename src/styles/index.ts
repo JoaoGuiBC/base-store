@@ -22,6 +22,7 @@ export const {
 
       background: '#121214',
       element: '#202024',
+      icon: '#8D8D99',
       text: '#C4C4CC',
       title: '#E1E1E6',
 
@@ -29,6 +30,7 @@ export const {
       highlightSelected: '#00B37E',
     },
     fontSizes: {
+      sm: '1rem',
       md: '1.125rem',
       lg: '1.25rem',
       xl: '1.5rem',

@@ -7,7 +7,7 @@ import Image from 'next/future/image';
 import { useState, useEffect } from 'react';
 import { getPlaiceholder } from 'plaiceholder';
 import { useKeenSlider } from 'keen-slider/react';
-import { CaretRight, CaretLeft } from 'phosphor-react';
+import { CaretRight, CaretLeft, Handbag } from 'phosphor-react';
 
 import { stripe } from '../lib/stripe';
 
@@ -42,7 +42,6 @@ const Home: NextPage<HomeProps> = ({ products }) => {
 
   useEffect(() => {
     setSlidesLength(instanceRef!.current!.track.details.slides.length - 1);
-    console.log(instanceRef!.current!.track.details.slides.length)
   }, [instanceRef]);
 
   return (
@@ -53,8 +52,8 @@ const Home: NextPage<HomeProps> = ({ products }) => {
       <HomeContainer ref={sliderRef} className="keen-slider">
 
         {products.map(product => (
-          <Link key={product.id} href={`/product/${product.id}`} prefetch={false}>
-            <Product className="keen-slider__slide">
+          <Product key={product.id} className="keen-slider__slide">
+            <Link href={`/product/${product.id}`} prefetch={false}>
               <Image
                 src={product.imageUrl}
                 blurDataURL={product.placeholderImage}
@@ -63,13 +62,18 @@ const Home: NextPage<HomeProps> = ({ products }) => {
                 height={336}
                 placeholder="blur"
               />
+            </Link>
 
-              <footer>
+            <footer>
+              <div>
                 <strong>{product.name}</strong>
                 <span>{product.price}</span>
-              </footer>
-            </Product>
-          </Link>
+              </div>
+              <button onClick={() => console.log('adicionar')}>
+                <Handbag size={30} />
+              </button>
+            </footer>
+          </Product>
         ))}
 
         <SlideButton
