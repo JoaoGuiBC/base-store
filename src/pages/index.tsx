@@ -10,6 +10,7 @@ import { useKeenSlider } from 'keen-slider/react';
 import { CaretRight, CaretLeft, Handbag } from 'phosphor-react';
 
 import { stripe } from '../lib/stripe';
+import { useCheckoutBag } from '../hooks/useCheckoutBag';
 
 import 'keen-slider/keen-slider.min.css';
 import { HomeContainer, Product, SlideButton } from '../styles/pages/home';
@@ -18,8 +19,10 @@ interface Products {
   id: string,
   name: string,
   price: string,
+  priceId: string,
   imageUrl: string,
   imageAlt: string,
+  priceRaw: number,
   placeholderImage: string,
 }
 
@@ -39,6 +42,8 @@ const Home: NextPage<HomeProps> = ({ products }) => {
       setCurrentSlide(slider.track.details.rel)
     },
   });
+
+  const { addProductToBag } = useCheckoutBag();
 
   useEffect(() => {
     setSlidesLength(instanceRef!.current!.track.details.slides.length - 1);
@@ -69,7 +74,7 @@ const Home: NextPage<HomeProps> = ({ products }) => {
                 <strong>{product.name}</strong>
                 <span>{product.price}</span>
               </div>
-              <button onClick={() => console.log('adicionar')}>
+              <button onClick={() => addProductToBag(product)}>
                 <Handbag size={30} />
               </button>
             </footer>
@@ -114,10 +119,12 @@ export const getStaticProps: GetStaticProps<{ products: Products[] }> = async ()
 
     return {
       id: product.id,
+      priceId: price.id,
       name: product.name,
       placeholderImage: base64,
       imageUrl: product.images[0],
       imageAlt: product.metadata.alt,
+      priceRaw: Number(price.unit_amount),
       price: new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL'
