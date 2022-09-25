@@ -168,8 +168,13 @@ export const Footer = styled('footer', {
 
     transition: 'background-color 0.2s',
 
-    '&:hover': {
-      background: '$highlightSelected',
+    '&:disabled': {
+      opacity: 0.6,
+      cursor: 'not-allowed',
+    },
+
+    '&:not(:disabled):hover': {
+      backgroundColor: '$highlightSelected',
     },
   }
 });

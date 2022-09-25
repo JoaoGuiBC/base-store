@@ -1,6 +1,5 @@
 import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
 
-import axios from "axios";
 import Stripe from "stripe";
 import Head from "next/head";
 import { useState } from "react";
@@ -8,6 +7,7 @@ import Image from "next/future/image";
 import { getPlaiceholder } from "plaiceholder";
 
 import { stripe } from "../../lib/stripe";
+import { useCheckoutBag } from "../../hooks/useCheckoutBag";
 
 import { ImageContainer, ProductContainer, ProductDetails } from "../../styles/pages/product";
 
@@ -15,10 +15,11 @@ interface Product {
   id: string,
   name: string,
   price: string,
+  priceId: string,
   imageUrl: string,
   imageAlt: string,
+  priceRaw: number,
   description: string,
-  defaultPriceId: string,
   placeholderImage: string,
 }
 
@@ -27,24 +28,7 @@ interface ProductProps {
 }
 
 const Product: NextPage<ProductProps> = ({ product }) => {
-  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] = useState(false);
-
-  async function handleBuyProduct() {
-    try {
-      setIsCreatingCheckoutSession(true);
-
-      const response = await axios.post('/api/createCheckoutSession', {
-        priceId: product.defaultPriceId,
-      });
-
-      const { checkoutUrl } = response.data;
-
-      window.location.href = checkoutUrl;
-    } catch (error) {
-      setIsCreatingCheckoutSession(false);
-      alert('Erro ao redirecionar para o checkout, por favor tente novamente mais tarde.');
-    }
-  }
+  const { addProductToBag } = useCheckoutBag();
 
   return (
     <>
@@ -71,8 +55,8 @@ const Product: NextPage<ProductProps> = ({ product }) => {
 
           <p>{product.description}</p>
 
-          <button disabled={isCreatingCheckoutSession} onClick={handleBuyProduct}>
-            Comprar agora
+          <button onClick={() => addProductToBag(product)}>
+            Colocar na sacola
           </button>
         </ProductDetails>
       </ProductContainer>
@@ -105,10 +89,11 @@ export const getStaticProps: GetStaticProps<{ product: Product }, { id: string }
       product: {
         id: product.id,
         name: product.name,
-        defaultPriceId: price.id,
+        priceId: price.id,
         placeholderImage: base64,
         imageUrl: product.images[0],
         imageAlt: product.metadata.alt,
+        priceRaw: Number(price.unit_amount),
         description: String(product.description),
         price: new Intl.NumberFormat('pt-BR', {
           style: 'currency',

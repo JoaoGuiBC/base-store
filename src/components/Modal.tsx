@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import axios from "axios";
 import { X } from "phosphor-react";
 import Image from "next/future/image";
+import { useEffect, useState } from "react";
 
 import { useCheckoutBag } from "../hooks/useCheckoutBag";
 
@@ -21,8 +22,31 @@ interface ModalProps {
 export function Modal({ isModalHidden, changeModalVisibility }: ModalProps) {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPrice, setTotalPrice] = useState('R$ 00,00');
+  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] = useState(false);
 
   const { products, removeProductFromBag } = useCheckoutBag();
+
+  async function handleBuyProduct() {
+    try {
+      setIsCreatingCheckoutSession(true);
+
+      const lineItems = products.map(prod => ({
+        price: prod.priceId,
+        quantity: prod.quantity,
+      }))
+
+      const response = await axios.post('/api/createCheckoutSession', {
+        lineItems,
+      });
+
+      const { checkoutUrl } = response.data;
+
+      window.location.href = checkoutUrl;
+    } catch (error) {
+      setIsCreatingCheckoutSession(false);
+      alert('Erro ao redirecionar para o checkout, por favor tente novamente mais tarde.');
+    }
+  }
 
   useEffect(() => {
     if (products.length > 0) {
@@ -71,7 +95,7 @@ export function Modal({ isModalHidden, changeModalVisibility }: ModalProps) {
 
               <div>
                 <span>{product.name}</span>
-                <span>Quantidade: {product.quantity}</span>
+                <span>Qtde: {product.quantity}</span>
                 <strong>{product.price}</strong>
 
                 <button
@@ -94,7 +118,9 @@ export function Modal({ isModalHidden, changeModalVisibility }: ModalProps) {
             <strong>{totalPrice}</strong>
           </div>
 
-          <button>Finalizar compra</button>
+          <button disabled={isCreatingCheckoutSession} onClick={handleBuyProduct}>
+            Finalizar compra
+          </button>
         </Footer>
       </ModalContainer>
     </ModalWrapper>
