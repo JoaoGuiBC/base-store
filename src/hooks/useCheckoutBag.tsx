@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 interface Product {
   name: string,
@@ -13,6 +13,7 @@ interface Product {
 
 interface CheckoutContextData {
   products: Product[];
+  totalProducts: number;
   removeProductFromBag(priceId: string): void;
   addProductToBag(newProduct: Omit<Product, "quantity">): void;
 };
@@ -25,6 +26,7 @@ export const CheckoutContext = createContext({} as CheckoutContextData);
 
 function CheckoutProvider({ children }: CheckoutProviderProps) {
   const [products, setProducts] = useState<Product[]>([]);
+  const [totalProducts, setTotalProducts] = useState(0);
 
   function addProductToBag(newProduct: Omit<Product, "quantity">) {
     const isAlreadyStored = products.find(product => product.priceId === newProduct.priceId);
@@ -62,8 +64,13 @@ function CheckoutProvider({ children }: CheckoutProviderProps) {
     }
   }
 
+  useEffect(() => {
+    const itemsQuantity = products.map(product => product.quantity).reduce((acc, cur) => acc + cur, 0);
+    setTotalProducts(itemsQuantity);
+  }, [products]);
+
   return (
-    <CheckoutContext.Provider value={{ products, addProductToBag, removeProductFromBag }}>
+    <CheckoutContext.Provider value={{ products, totalProducts, addProductToBag, removeProductFromBag }}>
       {children}
     </CheckoutContext.Provider>
   );

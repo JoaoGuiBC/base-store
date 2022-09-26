@@ -23,6 +23,7 @@ export const HeaderContainer = styled('div', {
 
   button: {
     display: 'flex',
+    position: 'relative',
     
     padding: 12,
 
@@ -30,11 +31,33 @@ export const HeaderContainer = styled('div', {
     borderRadius: 6,
     cursor: 'pointer',
     backgroundColor: '$element',
-
+    
     transition: 'all 0.2s',
-
+    
     '&:hover': {
-      filter: 'brightness(1.5)',
+      color: '$text',
+      backgroundColor: '#27272C',
+      // filter: 'brightness(1.5)',
+    },
+
+    div: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+
+      position: 'absolute',
+      top: '-8px',
+      right: '-8px',
+
+      width: '1.75rem',
+      height: '1.75rem',
+      
+      color: '$shape',
+      fontWeight: 'bold',
+
+      borderRadius: '50%',
+      border: '3px solid $background',
+      backgroundColor: '$highlight',
     },
   }
 });

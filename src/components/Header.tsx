@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { Handbag } from 'phosphor-react';
 
 import logoImg from '../assets/logo.svg';
+import { useCheckoutBag } from '../hooks/useCheckoutBag';
 
 import { HeaderContainer } from '../styles/components/header';
 
@@ -12,6 +13,7 @@ interface HeaderProps {
 
 export function Header({ changeModalVisibility }: HeaderProps) {
   const { pathname } = useRouter();
+  const { totalProducts } = useCheckoutBag();
 
   return (
     <HeaderContainer page={pathname === '/success' ? 'success' : 'other'}>
@@ -20,6 +22,8 @@ export function Header({ changeModalVisibility }: HeaderProps) {
       {pathname !== '/success' && (
         <button onClick={changeModalVisibility}>
           <Handbag size={24} />
+
+          <div>{totalProducts}</div>
         </button>
       )}
     </HeaderContainer>
