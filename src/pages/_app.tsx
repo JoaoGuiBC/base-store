@@ -2,6 +2,7 @@ import type { AppProps } from 'next/app';
 
 import { useState } from 'react';
 import Image from 'next/future/image';
+import { useRouter } from 'next/router';
 import { Handbag } from 'phosphor-react';
 
 import logoImg from '../assets/logo.svg';
@@ -20,6 +21,8 @@ globalStyles();
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [isModalHidden, setIsModalHidden] = useState(true);
 
+  const { pathname } = useRouter();
+
   function handleChangeModalVisibility() {
     setIsModalHidden(!isModalHidden);
   };
@@ -27,12 +30,14 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <CheckoutProvider>
       <Container>
-        <Header>
+        <Header page={pathname === '/success' ? 'success' : 'other'}>
           <Image src={logoImg} alt="Base store logo" height={120} width={120} />
 
-          <button onClick={handleChangeModalVisibility}>
-            <Handbag size={24} />
-          </button>
+          {pathname !== '/success' && (
+            <button onClick={handleChangeModalVisibility}>
+              <Handbag size={24} />
+            </button>
+          )}
         </Header>
 
         <Modal

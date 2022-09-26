@@ -7,7 +7,7 @@ import Image from 'next/future/image';
 
 import { stripe } from '../lib/stripe';
 
-import { ImageContainer, SuccessContainer } from '../styles/pages/success';
+import { Counter, ImageContainer, ImagesWrapper, SuccessContainer } from '../styles/pages/success';
 import { getPlaiceholder } from 'plaiceholder';
 
 interface Product {
@@ -18,11 +18,13 @@ interface Product {
 }
 
 interface SuccessProps {
-  product: Product,
+  products: Product[],
   customerName: string,
+  extraProductsCounter: number,
 }
 
-const Success: NextPage<SuccessProps> = ({ customerName, product }) => {
+const Success: NextPage<SuccessProps> = ({ customerName, products, extraProductsCounter }) => {
+  
 
   return (
     <>
@@ -33,21 +35,29 @@ const Success: NextPage<SuccessProps> = ({ customerName, product }) => {
       </Head>
     
       <SuccessContainer>
+        <ImagesWrapper quantity={products.length}>
+          {products.map(product => (
+            <ImageContainer key={product.name}>
+              <Image
+                src={product.imageUrl}
+                blurDataURL={product.placeholderImage}
+                alt={product.imageAlt}
+                width={120}
+                height={110}
+                placeholder="blur"
+              />
+            </ImageContainer>
+          ))}
+
+          {extraProductsCounter > 0 && (
+            <Counter>+{extraProductsCounter}</Counter>
+          )}
+        </ImagesWrapper>
+
         <h1>Compra efetuada!</h1>
 
-        <ImageContainer>
-          <Image
-            src={product.imageUrl}
-            blurDataURL={product.placeholderImage}
-            alt={product.imageAlt}
-            width={120}
-            height={110}
-            placeholder="blur"
-          />
-        </ImageContainer>
-
         <p>
-          Sucesso <strong>{customerName}</strong>, seu <strong>{product.name}</strong> já está a caminho da sua casa.
+          Sucesso <strong>{customerName}</strong>, sua compra já está a caminho da sua casa.
         </p>
 
         <Link href="/">
@@ -60,7 +70,7 @@ const Success: NextPage<SuccessProps> = ({ customerName, product }) => {
 
 export default Success;
 
-export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+export const getServerSideProps: GetServerSideProps<SuccessProps> = async ({ query }) => {
   if (!query.session_id) {
     return {
       redirect: {
@@ -77,18 +87,29 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   });
 
   const customerName = session.customer_details?.name!;
-  const product = session.line_items?.data[0]?.price?.product as Stripe.Product;
-  const { base64 } = await getPlaiceholder(product.images[0]);
+  const extraProductsCounter = session.line_items?.data?.length! - 3;
+  const products = session.line_items?.data
+    .map(product => product.price?.product)
+    .filter((_, index) => index < 3) as Stripe.Product[];
+
+  const mountedProducts = await Promise.all(products.map(async product => {
+    const { base64 } = await getPlaiceholder(product.images[0]);
+
+    return {
+      name: product.name,
+      placeholderImage: base64,
+      imageUrl: product.images[0],
+      imageAlt: product.metadata.alt,
+    }
+  }));
+
+  console.log(products);
 
   return {
     props: {
       customerName,
-      product: {
-        name: product.name,
-        placeholderImage: base64,
-        imageUrl: product.images[0],
-        imageAlt: product.metadata.alt,
-      },
+      extraProductsCounter,
+      products: mountedProducts,
     },
   }
 };

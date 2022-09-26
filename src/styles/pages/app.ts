@@ -13,13 +13,23 @@ export const Container = styled('div', {
 export const Header = styled('div', {
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
 
   width: '100%',
   maxWidth: 1180,
 
   margin: '0 auto',
   padding: '1rem 0',
+
+  variants: {
+    page: {
+      other: {
+        justifyContent: 'space-between',
+      },
+      success: {
+        justifyContent: 'center',
+      }
+    }
+  },
 
   button: {
     display: 'flex',
